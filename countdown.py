@@ -15,7 +15,7 @@ import pickle
 from docopt import docopt
 
 
-class countdown_word_solver(object):
+class CountdownWordSolver(object):
     def __init__(self, dictionary_name, threshold=5):
         self.threshold = int(threshold) if threshold else 5
 
@@ -81,7 +81,7 @@ if '__main__' == __name__:
     wordlist = args['--word_list']
     letters = re.findall("[a-zA-Z]", args['<letters>'])
 
-    solver = countdown_word_solver(wordlist, args['--min'])
+    solver = CountdownWordSolver(wordlist, args['--min'])
     words = solver.find_words(letters)
 
     pp.pprint(words)
