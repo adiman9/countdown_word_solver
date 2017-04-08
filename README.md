@@ -4,6 +4,9 @@ A basic python cli tool that will solve the letters games in the classic game sh
 The basic idea is you pass it a list of characters and the tool will find all the words hidden in that list of letters.
 
 ## Basic Usage
+Make sure that `countdown.py` is executable by running `chmod +x countdown.py`
+
+Then the basic usage of the tool is this:
 ```
 ./countdown.py <letters> [--word_list=<path_to_wordlist>] [--min=<word_length>]
 ```
