@@ -20,17 +20,22 @@ class countdown_word_solver(object):
         self.threshold = int(threshold) if threshold else 5
 
         if dictionary_name:
-            self.wordlist = sorted(list(set(
-                                            [word.strip().lower()
-                                            for word
-                                            in open(dictionary_name, 'r')]
-                                            )))
-
-            self.make_anagram_dict(self.wordlist)
+            self.load_word_list(dictionary_name)
         elif os.path.isfile('anagram_dict'):
             self.anagram_dict = self.load_anagram_dict()
+        elif os.path.isfile('words.txt'):
+            self.load_word_list('words.txt')
         else:
             raise ValueError('No wordlist file is specified and no anagram_dict exists')
+
+    def load_word_list(self, name):
+        self.wordlist = sorted(list(set(
+                                        [word.strip().lower()
+                                        for word
+                                        in open(name, 'r')]
+                                        )))
+
+        self.make_anagram_dict(self.wordlist)
 
     def load_anagram_dict(self):
         with open('anagram_dict', 'rb') as f:
