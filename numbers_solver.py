@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-numbers = [25, 8, 2, 9, 4, 2]
-target = 642
+numbers = [100, 3, 9, 6, 10, 3]
+target = 466
 
 def mult(x, y):
     return x * y
@@ -50,6 +50,11 @@ class CalcOperation(object):
             self.next = next
 
     def __repr__(self):
+        if self.op == '(' or self.op == ')':
+            if self.num:
+                return str(self.op + ' ' + str(self.num) + ' ')
+            else:
+                return str(self.op + ' ')
         return '{num} {op} '.format(num=self.num, op=self.op)
 
     def __str__(self):
@@ -77,14 +82,37 @@ class OperationList(object):
 
     def check_order(self, target):
         total = 0
+        skip = 0
         next_op = '+'
         for i, op in enumerate(self.operations):
+            skip = skip - 1
+            if(op.op == ')' or skip > 0):
+                continue
+            if(op.op == '('):
+                for y, ops in enumerate(self.operations[i:]):
+                    if(ops.op == ')'):
+                        parsed = self.parse_brackets(self.operations[i+1:y+1])
+                        total = OPS[next_op](total, parsed[0])
+                        next_op = parsed[1]
+                        ops.num = next_op
+                        skip = y + 1
+                continue
             if (next_op == '-' or next_op == '/') and op.num > total:
                 self.operations = self.swap(i)
                 return self.check_order(target)
             total = OPS[next_op](total, op.num)
             next_op = op.op
         assert total == target
+
+    def parse_brackets(self, list):
+        total = list[0].num
+        for i in range(1, len(list)):
+            total = OPS[list[i-1].op](total, list[i].num)
+
+        op = list[-1].op
+        list[-1].op = ''
+
+        return [total, op]
 
     def swap(self, index):
         list_copy = self.operations[:]
@@ -94,6 +122,8 @@ class OperationList(object):
 
         start = self.operations[index:index+1]
         to_move = self.operations[:index]
+        to_move.insert(0, CalcOperation(None, '('))
+        to_move.insert(len(to_move), CalcOperation(None, ')'))
         end = self.operations[index+1:]
         start.extend(to_move)
         start.extend(end)
