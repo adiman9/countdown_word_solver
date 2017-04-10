@@ -80,6 +80,8 @@ class NumberGameSolver(object):
     def _solve(self, operations=[], used=[], current=0, level=0):
         if not used:
             used = [False for num in self.numbers]
+        if not operations:
+            operations = [None for num in self.numbers]
 
         for i, val in enumerate(self.numbers):
             if used[i]:
@@ -91,20 +93,19 @@ class NumberGameSolver(object):
                     combo = sorted([current, val], reverse=True)
                     result = fn(combo[0], combo[1])
 
+                    operations[level] = CalcOperation(val)
+                    operations[level - 1].update(op=op, next=operations[level])
+
                     if find_abs_diff(result, self.target) < find_abs_diff(self.best, self.target):
                         if type(result) is int:
                             self.best = result
                             # print('NEW BEST')
                             # print(self.best)
-                            operations.append(CalcOperation(val))
-                            operations[-2].update(op=op, next=operations[-1])
-                            print(self.best)
-                            print(operations)
 
                             self.solution = NumberSolution(operations, self.best, self.target)
 
                             if self.best == self.target:
-                                # print(operations)
+                                print(operations)
                                 return self.solution
 
                     has_solution = self._solve(
@@ -116,7 +117,7 @@ class NumberGameSolver(object):
                         return has_solution
 
             else:
-                operations.append(CalcOperation(val))
+                operations[level] = CalcOperation(val)
                 has_solution = self._solve(
                             [obj for obj in operations],
                             [True if used[j] or j == i else False for (j, num) in enumerate(self.numbers)],
