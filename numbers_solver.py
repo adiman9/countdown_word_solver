@@ -150,7 +150,7 @@ class NumberGameSolver(object):
                     operations.insert(CalcOperation(val), level)
                     operations.update_op(level - 1, op=op, next=operations.get(level))
 
-                    if result > 0 and find_abs_diff(result, self.target) < find_abs_diff(self.best, self.target):
+                    if result > 0 and find_abs_diff(result, self.target) <= find_abs_diff(self.best, self.target):
                         if type(result) is int or type(result) is float:
 
                             if operations.check_order(self.target):
