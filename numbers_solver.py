@@ -1,25 +1,13 @@
 #!/usr/bin/env python
 
-numbers = [6,3,4,6,1,4]
-target = 458
-
-def mult(x, y):
-    return x * y
-
-def divide(x, y):
-    return x / y
-
-def add(x, y):
-    return x + y
-
-def sub(x, y):
-    return x - y
+numbers = [50,1,10,3,7,10]
+target = 112
 
 OPS = {
-    'x': mult,
-    '/': divide,
-    '+': add,
-    '-': sub
+    'x': lambda x,y: x*y,
+    '/': lambda x,y: x/y,
+    '+': lambda x,y: x+y,
+    '-': lambda x,y: x-y
 }
 
 def find_abs_diff(x, y):
