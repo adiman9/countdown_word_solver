@@ -7,9 +7,6 @@ Usage:
 import sys
 from docopt import docopt
 
-numbers = [25,50,75,100,3,6]
-target = 952
-
 OPS = {
     'x': lambda x,y: x*y,
     '/': lambda x,y: x/y,
