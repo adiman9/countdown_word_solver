@@ -41,6 +41,9 @@ OPS = [
     }
 ]
 
+def find_abs_diff(x, y):
+    return abs(x - y)
+
 class NumOperation(object):
     def __init__(self, num, op=None):
         """
@@ -63,47 +66,52 @@ class NumberSolution(object):
 
         return 'Only managed to find a result of {result}, this is an error of {error}'.format(result=self.result, error=abs(self.target - self.result))
 
-def solve(numbers, target, best=0, operations=None, used=[False for num in numbers], current=0, level=0):
+class NumberGameSolver(object):
+    def __init__(self, numbers, target):
+        self.numbers = sorted(numbers)
+        self.target = target
+        self.best = 0
 
-    if not operations:
-        operations = []
+        self.solution = self._solve()
 
-    used = [True if used[i] else False for (i, num) in enumerate(numbers)]
-    # print(used)
+    def __repr__(self):
+        return self.solution.__repr__()
 
-    numbers.sort()
+    def _solve(self, operations=[], used=[], current=0, level=0):
+        if not used:
+            used = [False for num in self.numbers]
 
-    for i, val in enumerate(numbers):
-        if used[i]:
-            continue
+        for i, val in enumerate(self.numbers):
+            if used[i]:
+                continue
 
-        if current > 0:
-            # print('GO CURRENT', current)
-            for op in OPS:
+            if current > 0:
+                for op in OPS:
 
-                combo = sorted([current, val], reverse=True)
-                result = op['fn'](combo[0], combo[1])
-                # print(combo[0], op['op'], combo[1], ' = ', result)
-                # print(level)
+                    combo = sorted([current, val], reverse=True)
+                    result = op['fn'](combo[0], combo[1])
 
-                if find_abs_diff(result, target) < find_abs_diff(best, target):
-                    # print('NEW BEST')
-                    best = result
+                    self._solve(operations,
+                                [True if used[j] or j == i else False for (j, num) in enumerate(self.numbers)],
+                                result,
+                                level+1)
 
-                    if best == target:
-                        return NumberSolution(operations, best, target)
+                    if find_abs_diff(result, self.target) < find_abs_diff(self.best, self.target):
+                        if type(result) is int:
+                            self.best = result
+                            # print('NEW BEST')
+                            # print(self.best)
 
-                used[i] = True
-                solve(numbers, target, best, operations, used, result, level+1)
-        else:
-            # print('NO CURRENT')
-            used[i] = True
-            solve(numbers, target, best, operations, used, val, level+1)
+                            if self.best == self.target:
+                                self.solution = NumberSolution(operations, self.best, self.target)
+                                return self.solution
 
-def find_abs_diff(x, y):
-    return abs(x - y)
-
-solution = solve(numbers, target)
-print(solution)
+            else:
+                self._solve(operations,
+                            [True if used[j] or j == i else False for (j, num) in enumerate(self.numbers)],
+                            val,
+                            level+1)
 
 
+solution = NumberGameSolver(numbers, target)
+# print(solution)
