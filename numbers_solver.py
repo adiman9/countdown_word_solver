@@ -73,6 +73,7 @@ class NumberGameSolver(object):
         self.best = 0
 
         self.solution = self._solve()
+        print(self.solution)
 
     def __repr__(self):
         return self.solution.__repr__()
@@ -91,10 +92,13 @@ class NumberGameSolver(object):
                     combo = sorted([current, val], reverse=True)
                     result = op['fn'](combo[0], combo[1])
 
-                    self._solve(operations,
-                                [True if used[j] or j == i else False for (j, num) in enumerate(self.numbers)],
-                                result,
-                                level+1)
+                    has_solution = self._solve(
+                                                operations,
+                                                [True if used[j] or j == i else False for (j, num) in enumerate(self.numbers)],
+                                                result,
+                                                level+1)
+                    if has_solution:
+                        return has_solution
 
                     if find_abs_diff(result, self.target) < find_abs_diff(self.best, self.target):
                         if type(result) is int:
@@ -107,11 +111,14 @@ class NumberGameSolver(object):
                                 return self.solution
 
             else:
-                self._solve(operations,
+                has_solution = self._solve(
+                            operations,
                             [True if used[j] or j == i else False for (j, num) in enumerate(self.numbers)],
                             val,
                             level+1)
 
+                if has_solution:
+                    return has_solution
+
 
 solution = NumberGameSolver(numbers, target)
-# print(solution)
