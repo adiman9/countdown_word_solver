@@ -168,7 +168,11 @@ class NumberGameSolver(object):
 
 if '__main__' == __name__:
     args = docopt(__doc__, argv=sys.argv[1:])
-    numbers = [int(num) for num in args['<numbers>'].split(' ')]
+
+    if ',' in args['<numbers>']:
+        numbers = [int(num) for num in args['<numbers>'].split(',')]
+    else:
+        numbers = [int(num) for num in args['<numbers>'].split(' ')]
 
     solution = NumberGameSolver(numbers, int(args['<target>']))
 
