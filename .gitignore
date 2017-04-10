@@ -1,1 +1,3 @@
 anagram_dict
+*.ipynb
+.ipynb_checkpoints/
