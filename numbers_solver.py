@@ -22,12 +22,24 @@ def sub(x, y):
     else:
         return y - x
 
-OPS = {
-    'x': mult,
-    '/': divide,
-    '+': add,
-    '-': sub,
-}
+OPS = [
+    {
+        'op': 'x',
+        'fn': mult
+    },
+    {
+        'op': '/',
+        'fn': divide
+    },
+    {
+        'op': '+',
+        'fn': add
+    },
+    {
+        'op': '-',
+        'fn': sub
+    }
+]
 
 class NumOperation(object):
     def __init__(self, num, op=None):
@@ -51,12 +63,13 @@ class NumberSolution(object):
 
         return 'Only managed to find a result of {result}, this is an error of {error}'.format(result=self.result, error=abs(self.target - self.result))
 
-def solve(numbers, target, best=0, operations=None, used=None):
+def solve(numbers, target, best=0, operations=None, used=[False for num in numbers], current=0, level=0):
 
     if not operations:
         operations = []
-    if not used:
-        used = [False for num in numbers]
+
+    used = [True if used[i] else False for (i, num) in enumerate(numbers)]
+    # print(used)
 
     numbers.sort()
 
@@ -64,30 +77,28 @@ def solve(numbers, target, best=0, operations=None, used=None):
         if used[i]:
             continue
 
-        for j in range(i+1, len(numbers)):
-            if used[j]:
-                continue
+        if current > 0:
+            # print('GO CURRENT', current)
+            for op in OPS:
 
-            jval = numbers[j]
-
-            combo = [val, jval]
-            combo.sort(reverse=True)
-
-            for op, fn in OPS.items():
-
-                result = fn(combo[0], combo[1])
+                combo = sorted([current, val], reverse=True)
+                result = op['fn'](combo[0], combo[1])
+                # print(combo[0], op['op'], combo[1], ' = ', result)
+                # print(level)
 
                 if find_abs_diff(result, target) < find_abs_diff(best, target):
+                    # print('NEW BEST')
                     best = result
 
                     if best == target:
                         return NumberSolution(operations, best, target)
-                    else:
-                        used[i] = True
-                        used[j] = True
 
-    return NumberSolution(operations, best, target)
-
+                used[i] = True
+                solve(numbers, target, best, operations, used, result, level+1)
+        else:
+            # print('NO CURRENT')
+            used[i] = True
+            solve(numbers, target, best, operations, used, val, level+1)
 
 def find_abs_diff(x, y):
     return abs(x - y)
