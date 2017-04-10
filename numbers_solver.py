@@ -2,7 +2,6 @@
 
 numbers = [25, 7, 9, 3, 1, 8]
 target = 642
-# target = 225
 
 def mult(x, y):
     return x * y
@@ -72,8 +71,8 @@ class OperationList(object):
     def trim(self):
         for i, op in enumerate(self.operations):
             if op.op is None:
-                self.operations = self.operations[:-1]
                 self.update_op(i, op='')
+                self.operations = self.operations[:i+1]
                 break
 
     def update_op(self, index, op=None, next=None, num=None):
