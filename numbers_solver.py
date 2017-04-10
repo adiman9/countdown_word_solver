@@ -1,25 +1,19 @@
 #!/usr/bin/env python
 
-numbers = [50,75,8,5,4,1]
-target = 937
+numbers = [6,3,4,6,1,4]
+target = 458
 
 def mult(x, y):
     return x * y
 
 def divide(x, y):
-    if(x > y):
-        return x / y
-    else:
-        return y / x
+    return x / y
 
 def add(x, y):
     return x + y
 
 def sub(x, y):
-    if(x > y):
-        return x - y
-    else:
-        return y - x
+    return x - y
 
 OPS = {
     'x': mult,
@@ -102,9 +96,10 @@ class OperationList(object):
             # if (next_op == '-' or next_op == '/') and op.num > total:
             #     self.operations = self.swap(i)
             #     return self.check_order(target)
-            total = OPS[next_op](total, op.num)
-            next_op = op.op
-        assert total == target
+            if op and next_op:
+                total = OPS[next_op](total, op.num)
+                next_op = op.op
+        return total == target
 
     # def parse_brackets(self, list):
     #     total = list[0].num
@@ -188,16 +183,16 @@ class NumberGameSolver(object):
                     operations.insert(CalcOperation(val), level)
                     operations.update_op(level - 1, op=op, next=operations.get(level))
 
-                    if find_abs_diff(result, self.target) < find_abs_diff(self.best, self.target):
-                        if type(result) is int:
-                            self.best = result
+                    if result > 0 and find_abs_diff(result, self.target) < find_abs_diff(self.best, self.target):
+                        if type(result) is int or type(result) is float:
 
-                            self.solution = NumberSolution(operations, self.best, self.target)
+                            if operations.check_order(self.target):
+                                self.best = result
+                                self.solution = NumberSolution(operations, self.best, self.target)
 
-                            if self.best == self.target:
-                                operations.check_order(self.target)
-                                operations.trim()
-                                return self.solution
+                                if self.best == self.target:
+                                    operations.trim()
+                                    return self.solution
 
                     has_solution = self._solve(
                                                 operations,
