@@ -67,53 +67,10 @@ class OperationList(object):
         skip = 0
         next_op = '+'
         for i, op in enumerate(self.operations):
-            # skip = skip - 1
-            # if(op.op == ')' or skip > 0):
-            #     continue
-            # if(op.op == '('):
-            #     for y, ops in enumerate(self.operations[i:]):
-            #         if(ops.op == ')'):
-            #             print('herere')
-            #             print(self.operations, i)
-            #             parsed = self.parse_brackets(self.operations[i+1:y+1])
-            #             total = OPS[next_op](total, parsed[0])
-            #             next_op = parsed[1]
-            #             ops.num = next_op
-            #             skip = y + 1
-            #     continue
-            # if (next_op == '-' or next_op == '/') and op.num > total:
-            #     self.operations = self.swap(i)
-            #     return self.check_order(target)
             if op and next_op:
                 total = OPS[next_op](total, op.num)
                 next_op = op.op
         return total == target
-
-    # def parse_brackets(self, list):
-    #     total = list[0].num
-    #     for i in range(1, len(list)):
-    #         print(list[i])
-    #         total = OPS[list[i-1].op](total, list[i].num)
-
-    #     op = list[-1].op
-    #     list[-1].op = ''
-
-    #     return [total, op]
-
-    # def swap(self, index):
-    #     list_copy = self.operations[:]
-    #     temp_op = self.operations[index].op
-    #     self.operations[index].op = self.operations[index-1].op
-    #     self.operations[index-1].op = temp_op
-
-    #     start = self.operations[index:index+1]
-    #     to_move = self.operations[:index]
-    #     to_move.insert(0, CalcOperation(None, '('))
-    #     to_move.insert(len(to_move), CalcOperation(None, ')'))
-    #     end = self.operations[index+1:]
-    #     start.extend(to_move)
-    #     start.extend(end)
-    #     return start
 
     def update_op(self, index, op=None, next=None, num=None):
         self.operations[index].update(op=op, next=next, num=num)
@@ -141,7 +98,6 @@ class NumberSolution(object):
 
 class NumberGameSolver(object):
     def __init__(self, numbers, target):
-        # self.numbers = sorted(numbers)
         self.numbers = sorted(numbers, reverse=True)
         self.target = target
         self.best = 0
