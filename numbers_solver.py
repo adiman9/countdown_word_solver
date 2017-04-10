@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-numbers = [25, 7, 9, 3, 1, 8]
+numbers = [25, 8, 2, 9, 4, 2]
 target = 642
 
 def mult(x, y):
@@ -75,6 +75,30 @@ class OperationList(object):
                 self.operations = self.operations[:i+1]
                 break
 
+    def check_order(self, target):
+        total = 0
+        next_op = '+'
+        for i, op in enumerate(self.operations):
+            if (next_op == '-' or next_op == '/') and op.num > total:
+                self.operations = self.swap(i)
+                return self.check_order(target)
+            total = OPS[next_op](total, op.num)
+            next_op = op.op
+        assert total == target
+
+    def swap(self, index):
+        list_copy = self.operations[:]
+        temp_op = self.operations[index].op
+        self.operations[index].op = self.operations[index-1].op
+        self.operations[index-1].op = temp_op
+
+        start = self.operations[index:index+1]
+        to_move = self.operations[:index]
+        end = self.operations[index+1:]
+        start.extend(to_move)
+        start.extend(end)
+        return start
+
     def update_op(self, index, op=None, next=None, num=None):
         self.operations[index].update(op=op, next=next, num=num)
 
@@ -124,6 +148,7 @@ class NumberGameSolver(object):
             if current > 0:
                 for op, fn in OPS.items():
 
+                    # TODO sorting this causes issues with the ordering of the operations
                     combo = sorted([current, val], reverse=True)
                     result = fn(combo[0], combo[1])
 
@@ -137,6 +162,7 @@ class NumberGameSolver(object):
                             self.solution = NumberSolution(operations, self.best, self.target)
 
                             if self.best == self.target:
+                                operations.check_order(self.target)
                                 operations.trim()
                                 return self.solution
 
