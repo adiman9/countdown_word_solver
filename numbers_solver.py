@@ -22,24 +22,12 @@ def sub(x, y):
     else:
         return y - x
 
-OPS = [
-    {
-        'op': 'x',
-        'fn': mult
-    },
-    {
-        'op': '/',
-        'fn': divide
-    },
-    {
-        'op': '+',
-        'fn': add
-    },
-    {
-        'op': '-',
-        'fn': sub
-    }
-]
+OPS = {
+    'x': mult,
+    '/': divide,
+    '+': add,
+    '-': sub
+}
 
 def find_abs_diff(x, y):
     return abs(x - y)
@@ -98,12 +86,26 @@ class NumberGameSolver(object):
                 continue
 
             if current > 0:
-                for op in OPS:
+                for op, fn in OPS.items():
 
                     combo = sorted([current, val], reverse=True)
-                    result = op['fn'](combo[0], combo[1])
-                    operations.append(CalcOperation(val))
-                    operations[-2].update(op=op['op'], next=operations[-1])
+                    result = fn(combo[0], combo[1])
+
+                    if find_abs_diff(result, self.target) < find_abs_diff(self.best, self.target):
+                        if type(result) is int:
+                            self.best = result
+                            # print('NEW BEST')
+                            # print(self.best)
+                            operations.append(CalcOperation(val))
+                            operations[-2].update(op=op, next=operations[-1])
+                            print(self.best)
+                            print(operations)
+
+                            self.solution = NumberSolution(operations, self.best, self.target)
+
+                            if self.best == self.target:
+                                # print(operations)
+                                return self.solution
 
                     has_solution = self._solve(
                                                 [obj for obj in operations],
@@ -112,18 +114,6 @@ class NumberGameSolver(object):
                                                 level+1)
                     if has_solution:
                         return has_solution
-
-                    if find_abs_diff(result, self.target) < find_abs_diff(self.best, self.target):
-                        if type(result) is int:
-                            self.best = result
-                            # print('NEW BEST')
-                            # print(self.best)
-
-                            self.solution = NumberSolution(operations, self.best, self.target)
-
-                            if self.best == self.target:
-                                print(operations)
-                                return self.solution
 
             else:
                 operations.append(CalcOperation(val))
