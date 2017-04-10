@@ -51,6 +51,7 @@ class CalcOperation(object):
 
 class OperationList(object):
     def __init__(self, size):
+        self.size = size
         self.operations = [None for val in range(size)]
 
     def insert(self, operation, index):
@@ -68,6 +69,18 @@ class OperationList(object):
                 self.update_op(i, op='')
                 self.operations = self.operations[:i+1]
                 break
+
+    def trim_copy(self):
+        new_op = OperationList(self.size)
+
+        for i,op in enumerate(self.operations):
+            new_op.insert(op, i)
+
+        new_op.trim()
+
+        print(new_op)
+
+        return new_op
 
     def check_order(self, target):
         total = 0
@@ -108,12 +121,18 @@ class NumberGameSolver(object):
         self.numbers = sorted(numbers, reverse=True)
         self.target = target
         self.best = 0
+        self.solution = None
+        self.solutions = []
 
-        self.solution = self._solve()
-        print(self.solution)
+        self._solve()
+        # print(self.solution)
 
     def __repr__(self):
-        return self.solution.__repr__()
+        text = ''
+        for sol in self.solutions:
+            text += sol.__repr__() + '\n'
+        return text
+        # return self.solution.__repr__()
 
     def _solve(self, operations=[], used=[], current=0, level=0):
         if not used:
@@ -139,31 +158,25 @@ class NumberGameSolver(object):
 
                             if operations.check_order(self.target):
                                 self.best = result
-                                self.solution = NumberSolution(operations, self.best, self.target)
+                                self.solution = NumberSolution(operations.trim_copy(), self.best, self.target)
 
                                 if self.best == self.target:
-                                    operations.trim()
-                                    return self.solution
+                                    self.solutions.append(NumberSolution(operations.trim_copy(), self.best, self.target))
+                                    # operations.trim()
 
-                    has_solution = self._solve(
-                                                operations,
-                                                [True if used[j] or j == i else False for (j, num) in enumerate(self.numbers)],
-                                                result,
-                                                level+1)
-                    if has_solution:
-                        return has_solution
+                    self._solve(
+                                operations,
+                                [True if used[j] or j == i else False for (j, num) in enumerate(self.numbers)],
+                                result,
+                                level+1)
 
             else:
                 operations.insert(CalcOperation(val), level)
-                has_solution = self._solve(
+                self._solve(
                             operations,
                             [True if used[j] or j == i else False for (j, num) in enumerate(self.numbers)],
                             val,
                             level+1)
-
-                if has_solution:
-                    return has_solution
-
 
 
 if '__main__' == __name__:
