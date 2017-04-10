@@ -39,6 +39,18 @@ class NumOperation(object):
         self.op = op
         self.next = None
 
+class NumberSolution(object):
+    def __init__(self, operations, result, target):
+        self.operations = operations
+        self.result = result
+        self.target = target
+
+    def __repr__(self):
+        if(self.result - self.target == 0):
+            return 'Found A Solution'
+
+        return 'Only managed to find a result of {result}, this is an error of {error}'.format(result=self.result, error=abs(self.target - self.result))
+
 def solve(numbers, target, best=0, operations=None, used=None):
 
     if not operations:
@@ -51,25 +63,31 @@ def solve(numbers, target, best=0, operations=None, used=None):
     for i, val in enumerate(numbers):
         if used[i]:
             continue
-        used[i] = True
 
         for j in range(i+1, len(numbers)):
             if used[j]:
-                print('USED', j)
                 continue
-            used[j] = True
 
             jval = numbers[j]
 
+            combo = [val, jval]
+            combo.sort(reverse=True)
+
             for op, fn in OPS.items():
 
-                result = fn(val, jval)
+                result = fn(combo[0], combo[1])
 
                 if find_abs_diff(result, target) < find_abs_diff(best, target):
                     best = result
 
                     if best == target:
-                        return operations
+                        return NumberSolution(operations, best, target)
+                    else:
+                        used[i] = True
+                        used[j] = True
+
+    return NumberSolution(operations, best, target)
+
 
 def find_abs_diff(x, y):
     return abs(x - y)
