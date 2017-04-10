@@ -43,15 +43,48 @@ class CalcOperation(object):
         self.next = None
 
     def update(self, op=None, next=None, num=None):
-        if(num):
+        if(num is not None):
             self.num = num
-        if(op):
+        if(op is not None):
             self.op = op
-        if(next):
+        if(next is not None):
             self.next = next
 
     def __repr__(self):
         return '{num} {op} '.format(num=self.num, op=self.op)
+
+    def __str__(self):
+        return self.__repr__()
+
+class OperationList(object):
+    def __init__(self, size):
+        self.operations = [None for val in range(size)]
+
+    def insert(self, operation, index):
+        self.operations[index] = operation
+
+    def get(self, index):
+        return self.operations[index]
+
+    def all(self):
+        return self.operations
+
+    def trim(self):
+        for i, op in enumerate(self.operations):
+            if op.op is None:
+                self.operations = self.operations[:-1]
+                self.update_op(i, op='')
+                break
+
+    def update_op(self, index, op=None, next=None, num=None):
+        self.operations[index].update(op=op, next=next, num=num)
+
+    def __repr__(self):
+        text = ''
+        for op in self.operations:
+            text += str(op)
+
+        return text
 
 class NumberSolution(object):
     def __init__(self, operations, result, target):
@@ -61,9 +94,11 @@ class NumberSolution(object):
 
     def __repr__(self):
         if(self.result - self.target == 0):
-            return 'Found A Solution'
+            print('Found A Solution\n')
+        else:
+            print('Only managed to find a result of {result}, this is an error of {error}\n'.format(result=self.result, error=abs(self.target - self.result)))
 
-        return 'Only managed to find a result of {result}, this is an error of {error}'.format(result=self.result, error=abs(self.target - self.result))
+        return self.operations.__repr__()
 
 class NumberGameSolver(object):
     def __init__(self, numbers, target):
@@ -81,7 +116,7 @@ class NumberGameSolver(object):
         if not used:
             used = [False for num in self.numbers]
         if not operations:
-            operations = [None for num in self.numbers]
+            operations = OperationList(len(self.numbers))
 
         for i, val in enumerate(self.numbers):
             if used[i]:
@@ -93,23 +128,21 @@ class NumberGameSolver(object):
                     combo = sorted([current, val], reverse=True)
                     result = fn(combo[0], combo[1])
 
-                    operations[level] = CalcOperation(val)
-                    operations[level - 1].update(op=op, next=operations[level])
+                    operations.insert(CalcOperation(val), level)
+                    operations.update_op(level - 1, op=op, next=operations.get(level))
 
                     if find_abs_diff(result, self.target) < find_abs_diff(self.best, self.target):
                         if type(result) is int:
                             self.best = result
-                            # print('NEW BEST')
-                            # print(self.best)
 
                             self.solution = NumberSolution(operations, self.best, self.target)
 
                             if self.best == self.target:
-                                print(operations)
+                                operations.trim()
                                 return self.solution
 
                     has_solution = self._solve(
-                                                [obj for obj in operations],
+                                                operations,
                                                 [True if used[j] or j == i else False for (j, num) in enumerate(self.numbers)],
                                                 result,
                                                 level+1)
@@ -117,9 +150,9 @@ class NumberGameSolver(object):
                         return has_solution
 
             else:
-                operations[level] = CalcOperation(val)
+                operations.insert(CalcOperation(val), level)
                 has_solution = self._solve(
-                            [obj for obj in operations],
+                            operations,
                             [True if used[j] or j == i else False for (j, num) in enumerate(self.numbers)],
                             val,
                             level+1)
