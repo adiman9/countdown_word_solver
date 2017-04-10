@@ -1,7 +1,14 @@
 #!/usr/bin/env python
 
-numbers = [50,1,10,3,7,10]
-target = 112
+"""
+Usage:
+    numbers_solver <numbers> <target>
+"""
+import sys
+from docopt import docopt
+
+numbers = [25,50,75,100,3,6]
+target = 952
 
 OPS = {
     'x': lambda x,y: x*y,
@@ -90,7 +97,7 @@ class NumberSolution(object):
 
     def __repr__(self):
         if(self.result - self.target == 0):
-            print('Found A Solution\n')
+            print('\nFound A Solution\n')
         else:
             print('Only managed to find a result of {result}, this is an error of {error}\n'.format(result=self.result, error=abs(self.target - self.result)))
 
@@ -158,4 +165,10 @@ class NumberGameSolver(object):
                     return has_solution
 
 
-solution = NumberGameSolver(numbers, target)
+
+if '__main__' == __name__:
+    args = docopt(__doc__, argv=sys.argv[1:])
+    numbers = [int(num) for num in args['<numbers>'].split(' ')]
+
+    solution = NumberGameSolver(numbers, int(args['<target>']))
+
